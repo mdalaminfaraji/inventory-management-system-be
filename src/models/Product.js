@@ -13,13 +13,12 @@ const productSchema = new mongoose.Schema(
 );
 
 // Automatically set status to Out of Stock if stock is 0
-productSchema.pre('save', function (next) {
+productSchema.pre('save', function () {
   if (this.stock === 0) {
     this.status = 'Out of Stock';
   } else if (this.stock > 0 && this.status === 'Out of Stock') {
     this.status = 'Active';
   }
-  next();
 });
 
 module.exports = mongoose.model('Product', productSchema);

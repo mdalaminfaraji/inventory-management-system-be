@@ -3,8 +3,23 @@ const Product = require('../models/Product');
 const logActivity = require('../utils/logger');
 
 exports.getOrders = async (req, res) => {
-  const orders = await Order.find({}).populate('items.product', 'name');
-  res.json(orders);
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const skip = (page - 1) * limit;
+
+  const total = await Order.countDocuments();
+  const orders = await Order.find({})
+    .populate('items.product', 'name')
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit);
+
+  res.json({
+    orders,
+    page,
+    pages: Math.ceil(total / limit),
+    total,
+  });
 };
 
 exports.getOrderById = async (req, res) => {
